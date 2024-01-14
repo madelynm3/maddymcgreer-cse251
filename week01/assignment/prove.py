@@ -28,7 +28,7 @@ from unittest import TestCase
 #      - return value: float
 #      The function should perform the mathematical operation, represented
 #      by the string operation parameter, on the initial_value and value.
-#      Delete these instructions and replace with your own description of that the function does.
+
 
 def perform_math(initial_value, value, operation):
     if operation == '+':
@@ -52,22 +52,22 @@ def perform_math(initial_value, value, operation):
 #      - words: list
 #      - return value: int
 #      The function should return the index value of the word_to_find in the words list.
-#      Delete these instructions and replace with your own description of that the function does.
 
-    def find_word_index(word_to_find, words):
-        try:
-            index = words.index(word_to_find)
-            return index
+
+def find_word_index(word_to_find, words):
+    try:
+        index = words.index(word_to_find)
+        return index
         
-        except ValueError:
-            return -1
+    except ValueError:
+        return -1
 
 # 3) TODO write a function called 'get_value_from_dict_using_key' that takes two parameters:
 #      - key: str
 #      - word_dict: dict
 #      - return value: str
 #      The function should return the value (which will be a string) mapped to the key.
-#      Delete these instructions and replace with your own description of that the function does.
+
 
 def get_value_from_dict_using_key(key, word_dict):
     try:
@@ -81,10 +81,15 @@ def get_value_from_dict_using_key(key, word_dict):
 #      - url_dict: dict
 #      - return value: list
 #      The function should return the value (which will be a list) mapped to the key.
-#      Delete these instructions and replace with your own description of that the function does.
+
 
 
 def get_list_of_urls_from_dict(key, url_dict):
+    try:
+        url_list = url_dict[key]
+        return url_list
+    except KeyError:
+        return []
     
 # 5) TODO write a function called 'find_url' that takes two parameters:
 #      - urls: list
@@ -92,14 +97,32 @@ def get_list_of_urls_from_dict(key, url_dict):
 #      - return value: str
 #      The function should return the url that contains the name within a list of urls,
 #      else return a blank string.
-#      Delete these instructions and replace with your own description of that the function does.
+
+
+def find_url(urls, name):
+    for url in urls:
+        if name in url:
+            return url
+    return ""
 
 # 6) TODO write a function called 'find_str_in_file' that takes two parameters:
 #      - filename: str
 #      - str_to_find: str
 #      - return value: bool
 #      The function should return true if str_to_find is within the file, else false
-#      Delete these instructions and replace with your own description of that the function does.
+
+
+def find_str_in_file(filename, str_to_find):
+    try:
+        with open(filename, 'r') as file:
+            content = file.read()
+            return str_to_find in content
+    except FileNotFoundError:
+        print(f"File '{filename}' not found.")
+        return False
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False
 
 # 7) TODO write a class called 'MyParentClass'. The constructor should take three parameters:
 #      - value: int
@@ -107,8 +130,21 @@ def get_list_of_urls_from_dict(key, url_dict):
 #      - name: str
 #      Add a method called 'get_value_using_index' that returns the value
 #      in the values list at an index that is passed.
-#      Delete these instructions and replace with your own description of that the function does.
 
+
+class MyParentClass:
+    def __init__(self, value, values, name):
+        self.value = value
+        self.values = values
+        self.name = name
+
+    def get_value_using_index(self, index):
+        try:
+            return self.values[index]
+        except IndexError:
+            print(f"Index {index} is out of range for the values list.")
+            return None
+        
 # 8) TODO write a class called 'MyChildClass'. The class should extend the MyParentClass.
 #      The constructor should take four parameters:
 #      - value: int
@@ -116,7 +152,13 @@ def get_list_of_urls_from_dict(key, url_dict):
 #      - name: str
 #      - age: int
 #      The constructor should call super and pass in the appropriate parameters
-#      Delete these instructions and replace with your own description of that the function does.
+
+        
+class MyChildClass(MyParentClass):
+    def __init__(self, value, values, name, age):
+        super().__init__(value, values, name)
+        self.age = age
+
 
 # 9) TODO write a function called 'pass_by_reference_mutable_example' that takes two parameters:
 #      - lists_are_passed_by_reference_and_mutable: list
@@ -126,8 +168,12 @@ def get_list_of_urls_from_dict(key, url_dict):
 #      that the memory id of the list stays the same after adding the string. Also, the function
 #      does not need to return the list in order for it to see the newly added item. Since the function
 #      needs to return a string, you can make changes to a list without needing to return it from a function.
-#      Delete these instructions and replace with your own description of that the function does.
-#      10) TODO: Provide a quick explanation of what pass-by-reference means. Also, what does mutable mean?
+
+#      10) TODO: Pass-by-reference involves passing a reference to the original object, and mutable means that the object can be modified after creation.
+
+def pass_by_reference_mutable_example(lists_are_passed_by_reference_and_mutable,str_to_add):
+    lists_are_passed_by_reference_and_mutable.append(str_to_add)
+    return lists_are_passed_by_reference_and_mutable[0]
 
 # 11) TODO write a function called 'pass_by_reference_immutable_example' that takes two parameters:
 #      - strings_are_pass_by_reference_and_immutable: string
@@ -135,12 +181,18 @@ def get_list_of_urls_from_dict(key, url_dict):
 #      - return value: str
 #      The function should append the str_to_add to the strings_are_pass_by_reference_and_immutable string.
 #      Notice that in the asserts, that the memory id of the first string and the return string are different.
-#      Delete these instructions and replace with your own description of that the function does.
+
 #      12) TODO: What does immutable mean?
 
 # Don't change any of the assert lines. All asserts should pass. You should see "All tests passed!" if all assert pass.
 # If an assert doesn't pass, you will see an AssertionError (see https://www.w3schools.com/python/ref_keyword_assert.asp).
 # The AssertionError will show you why it didn't pass (meaning, it is not an error with the assertion code, but with your code)
+
+def pass_by_reference_immutable_example(strings_are_pass_by_reference_and_immutable, str_to_add):
+    result_string = strings_are_pass_by_reference_and_immutable + str_to_add
+    return result_string
+
+
 def main():
     ''' Know how to:
         - Call a function
@@ -210,7 +262,8 @@ def main():
         - Readings: https://www.geeksforgeeks.org/python-classes-and-objects/, https://www.geeksforgeeks.org/extend-class-method-in-python/
     '''
     # 13) TODO instantiate an object using MyParentClass with the following three parameters: (1, [5, 6, 7], "3")
-    obj = ...
+
+    obj = MyParentClass(1, [5, 6, 7], "3")
     assert obj.value == 1
     assert obj.values == [5, 6, 7]
     assert obj.name == "3"
@@ -223,7 +276,8 @@ def main():
     # class constructor already creates the value, values, and name parameters. Do not write these in the child
     # class. Instead, the child constructor should call the parent constructor. Same for the 'get_value_using_index'
     # function, do not rewrite this in the child class.
-    childObj = ...
+ 
+    childObj = MyChildClass(MyParentClass(1, [5, 6, 7], "3", 10))
     assert childObj.value == 1
     assert childObj.values == [5, 6, 7]
     assert childObj.name == "3"
@@ -260,4 +314,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main
