@@ -21,14 +21,9 @@ Not passing an assert or answering #10 and #12: 0 points (code must pass all ass
 
 from unittest import TestCase
 
-# 1) TODO write a function called 'perform_math' that takes three parameters:
-#      - initial_value: int
-#      - value: int
-#      - operation: str
-#      - return value: float
-#      The function should perform the mathematical operation, represented
-#      by the string operation parameter, on the initial_value and value.
-
+# 1) 
+# The function 'perform_math' performs a mathematical operation on the initial_value and value. Returns an integer.
+# 3 parameters: initial_value: int, value: int, operation: str.
 
 def perform_math(initial_value, value, operation):
     if operation == '+':
@@ -47,12 +42,9 @@ def perform_math(initial_value, value, operation):
     return result
     
 
-# 2) TODO write a function called 'find_word_index' that takes two parameters:
-#      - word_to_find: str
-#      - words: list
-#      - return value: int
-#      The function should return the index value of the word_to_find in the words list.
-
+# 2) 
+# The function 'find_word_index' returns the index value of the 'word_to_find' in the words list. 
+# 2 parameters: word_to_find: str, words: list
 
 def find_word_index(word_to_find, words):
     try:
@@ -62,12 +54,9 @@ def find_word_index(word_to_find, words):
     except ValueError:
         return -1
 
-# 3) TODO write a function called 'get_value_from_dict_using_key' that takes two parameters:
-#      - key: str
-#      - word_dict: dict
-#      - return value: str
-#      The function should return the value (which will be a string) mapped to the key.
-
+# 3) 
+# The function 'get_value_from_dict_using_key' returns the string value mapped to the key.
+# 2 parameters: key: str, word_dict: dict
 
 def get_value_from_dict_using_key(key, word_dict):
     try:
@@ -76,13 +65,9 @@ def get_value_from_dict_using_key(key, word_dict):
     except KeyError:
         return None
 
-# 4) TODO write a function called 'get_list_of_urls_from_dict' that takes two parameters:
-#      - key: str
-#      - url_dict: dict
-#      - return value: list
-#      The function should return the value (which will be a list) mapped to the key.
-
-
+# 4) 
+# The function 'get_list_of_urls_from_dict' returns the list value mapped to the key.
+# 2 parameters: key: str, url_dict: dict
 
 def get_list_of_urls_from_dict(key, url_dict):
     try:
@@ -91,13 +76,9 @@ def get_list_of_urls_from_dict(key, url_dict):
     except KeyError:
         return []
     
-# 5) TODO write a function called 'find_url' that takes two parameters:
-#      - urls: list
-#      - name: str
-#      - return value: str
-#      The function should return the url that contains the name within a list of urls,
-#      else return a blank string.
-
+# 5) 
+# The function 'find_url' returns the url that contains the name within a list of URLs, otherwise returns a blank string. 
+# 2 parameters: urls: list, name: str
 
 def find_url(urls, name):
     for url in urls:
@@ -105,12 +86,9 @@ def find_url(urls, name):
             return url
     return ""
 
-# 6) TODO write a function called 'find_str_in_file' that takes two parameters:
-#      - filename: str
-#      - str_to_find: str
-#      - return value: bool
-#      The function should return true if str_to_find is within the file, else false
-
+# 6) 
+# The function 'find_str_in_file' returns true if 'str_to_find' is within the file, otherwise returns false. 
+# 2 parameters: filename: str, str_to_find: str
 
 def find_str_in_file(filename, str_to_find):
     try:
@@ -124,13 +102,9 @@ def find_str_in_file(filename, str_to_find):
         print(f"An error occurred: {e}")
         return False
 
-# 7) TODO write a class called 'MyParentClass'. The constructor should take three parameters:
-#      - value: int
-#      - values: list
-#      - name: str
-#      Add a method called 'get_value_using_index' that returns the value
-#      in the values list at an index that is passed.
-
+# 7) 
+# The class 'MyParentClass' uses the method 'get_value_using_index' to return the value in the values list at an index that is passed. 
+# It takes 3 parameters: value: int, values: list, name: str
 
 class MyParentClass:
     def __init__(self, value, values, name):
@@ -145,44 +119,31 @@ class MyParentClass:
             print(f"Index {index} is out of range for the values list.")
             return None
         
-# 8) TODO write a class called 'MyChildClass'. The class should extend the MyParentClass.
-#      The constructor should take four parameters:
-#      - value: int
-#      - values: list
-#      - name: str
-#      - age: int
-#      The constructor should call super and pass in the appropriate parameters
+# 8) 
+# The class 'MyChildClass' extends from the MyParentClass and calls super and pass in the appropriate parameters.
+# Constructor takes 4 parameters: value: int, values: list, name: str, age: int.
 
-        
 class MyChildClass(MyParentClass):
     def __init__(self, value, values, name, age):
         super().__init__(value, values, name)
         self.age = age
 
 
-# 9) TODO write a function called 'pass_by_reference_mutable_example' that takes two parameters:
-#      - lists_are_passed_by_reference_and_mutable: list
-#      - str_to_add: str
-#      - return value: str
-#      The function should append the str_to_add to the list and return index zero. Notice that in the asserts,
-#      that the memory id of the list stays the same after adding the string. Also, the function
-#      does not need to return the list in order for it to see the newly added item. Since the function
-#      needs to return a string, you can make changes to a list without needing to return it from a function.
+# 9) 
+# The function 'pass_by_reference_mutable_example' appends the str_to_add to the list and returns index zero. Returns a string.
+# 2 parameters: lists_are_passed_by_reference_and_mutable: list, str_to_add: str
 
-#      10) TODO: Pass-by-reference involves passing a reference to the original object, and mutable means that the object can be modified after creation.
+#     10) Pass-by-reference involves passing a reference to the original object, and mutable means that the object can be modified after creation.
 
 def pass_by_reference_mutable_example(lists_are_passed_by_reference_and_mutable,str_to_add):
     lists_are_passed_by_reference_and_mutable.append(str_to_add)
     return lists_are_passed_by_reference_and_mutable[0]
 
-# 11) TODO write a function called 'pass_by_reference_immutable_example' that takes two parameters:
-#      - strings_are_pass_by_reference_and_immutable: string
-#      - str_to_add: str
-#      - return value: str
-#      The function should append the str_to_add to the strings_are_pass_by_reference_and_immutable string.
-#      Notice that in the asserts, that the memory id of the first string and the return string are different.
+# 11) 
+# The function 'pass_by_reference_immutable_example' appends the 'str_to_add' to the 'strings_are_pass_by_reference_and_immutable string'. Returns a string.
+# 2 parameters: strings_are_pass_by_reference_and_immutable: string, str_to_add: str
 
-#      12) TODO: What does immutable mean?
+#      12) Immutable means something cannot be changed once it has been created.
 
 # Don't change any of the assert lines. All asserts should pass. You should see "All tests passed!" if all assert pass.
 # If an assert doesn't pass, you will see an AssertionError (see https://www.w3schools.com/python/ref_keyword_assert.asp).
