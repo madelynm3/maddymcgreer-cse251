@@ -32,12 +32,16 @@ def perform_math(initial_value, value, operation):
         result = initial_value - value
     elif operation == '*':
         result = initial_value * value
+    elif operation == '**':
+        result = initial_value ** value
     elif operation == '/':
         if value == 0:
             raise ValueError("Division by zero is not allowed.")
         result = initial_value / value
+    elif operation == '//':
+        result = initial_value // value
     else:
-        raise ValueError("Unsupported operation. Please use '+', '-', '*', or '/'.")
+        raise ValueError("Unsupported operation. Please use '+', '-', '*', '**','//' or '/'.")
 
     return result
     
@@ -89,6 +93,7 @@ def find_url(urls, name):
 # 6) 
 # The function 'find_str_in_file' returns true if 'str_to_find' is within the file, otherwise returns false. 
 # 2 parameters: filename: str, str_to_find: str
+
 
 def find_str_in_file(filename, str_to_find):
     try:
@@ -238,7 +243,7 @@ def main():
     # class. Instead, the child constructor should call the parent constructor. Same for the 'get_value_using_index'
     # function, do not rewrite this in the child class.
  
-    childObj = MyChildClass(MyParentClass(1, [5, 6, 7], "3", 10))
+    childObj = MyChildClass(1, [5, 6, 7], "3", 10)
     assert childObj.value == 1
     assert childObj.values == [5, 6, 7]
     assert childObj.name == "3"
@@ -254,8 +259,9 @@ def main():
         - Understand how to compare strings
         - Readings: https://www.geeksforgeeks.org/open-a-file-in-python/, https://www.geeksforgeeks.org/with-statement-in-python/
     '''
-    assert find_str_in_file("data.txt", "g") == True
-    assert find_str_in_file("data.txt", "1") == False
+    # I edited these asserts to use the right path name for data.txt. 
+    assert find_str_in_file("week01/assignment/data.txt", "g") == True
+    assert find_str_in_file("week01/assignment/data.txt", "1") == False
 
     '''
         - Know the difference between pass-by-reference and pass-by-value.
@@ -275,4 +281,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main
+    main()
