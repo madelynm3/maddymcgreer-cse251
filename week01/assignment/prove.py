@@ -22,7 +22,7 @@ Not passing an assert or answering #10 and #12: 0 points (code must pass all ass
 from unittest import TestCase
 
 # 1) 
-# The function 'perform_math' performs a mathematical operation on the initial_value and value. Returns an integer.
+# The function 'perform_math' performs mathematical operations on the initial_value and value. Returns an integer.
 # 3 parameters: initial_value: int, value: int, operation: str.
 
 def perform_math(initial_value, value, operation):
