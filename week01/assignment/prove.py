@@ -30,12 +30,37 @@ from unittest import TestCase
 #      by the string operation parameter, on the initial_value and value.
 #      Delete these instructions and replace with your own description of that the function does.
 
+def perform_math(initial_value, value, operation):
+    if operation == '+':
+            result = initial_value + value
+    elif operation == '-':
+        result = initial_value - value
+    elif operation == '*':
+        result = initial_value * value
+    elif operation == '/':
+        if value == 0:
+            raise ValueError("Division by zero is not allowed.")
+        result = initial_value / value
+    else:
+        raise ValueError("Unsupported operation. Please use '+', '-', '*', or '/'.")
+
+    return result
+    
+
 # 2) TODO write a function called 'find_word_index' that takes two parameters:
 #      - word_to_find: str
 #      - words: list
 #      - return value: int
 #      The function should return the index value of the word_to_find in the words list.
 #      Delete these instructions and replace with your own description of that the function does.
+
+    def find_word_index(word_to_find, words):
+        try:
+            index = words.index(word_to_find)
+            return index
+        
+        except ValueError:
+            return -1
 
 # 3) TODO write a function called 'get_value_from_dict_using_key' that takes two parameters:
 #      - key: str
@@ -44,6 +69,13 @@ from unittest import TestCase
 #      The function should return the value (which will be a string) mapped to the key.
 #      Delete these instructions and replace with your own description of that the function does.
 
+def get_value_from_dict_using_key(key, word_dict):
+    try:
+        value = word_dict[key]
+        return value
+    except KeyError:
+        return None
+
 # 4) TODO write a function called 'get_list_of_urls_from_dict' that takes two parameters:
 #      - key: str
 #      - url_dict: dict
@@ -51,6 +83,9 @@ from unittest import TestCase
 #      The function should return the value (which will be a list) mapped to the key.
 #      Delete these instructions and replace with your own description of that the function does.
 
+
+def get_list_of_urls_from_dict(key, url_dict):
+    
 # 5) TODO write a function called 'find_url' that takes two parameters:
 #      - urls: list
 #      - name: str
