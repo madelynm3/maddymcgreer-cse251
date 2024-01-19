@@ -32,19 +32,41 @@ d. How do you get the value an object's attribute (see https://datagy.io/python-
 # DO NOT USE GLOBALS #
 ######################
 
-# TODO - Create a thread class, see this week's reading to learn how
+# Create MyThread class which will: 
+# 1. Call parent class constructor
+# 2. Store number as parameter
+# 3. Initialize sum at 0
+class MyThread(threading.Thread):
+   def __init__(self, number):
+        threading.Thread.__init__(self)
+        self.number = number
+        self.sum = 0
+
+   # Calculate sum from 1 to limit     
+   def run(self):
+       for i in range(1, self.number):
+           self.sum += i
 
 def main():
-    # Instantiate your thread class and pass in 10.
-    # Test (assert) if its sum attribute is equal to 45.
-    # Note: do no use 'yourThread' for the name of your thread object
-    assert yourThread.sum == 45, f'The sum should equal 45 but instead was {yourThread.sum}'
+    # Instantiate MyThread class using values 10, 13, and 17
+    t10 = MyThread(10)
+    t13 = MyThread(13)
+    t17 = MyThread(17)
     
-    # Repeat, passing in 13
-    assert yourThread.sum == 78, f'The sum should equal 78 but instead was {yourThread.sum}'
-    
-    # Repeat, passing in 17
-    assert yourThread.sum == 136, f'The sum should equal 136 but instead was {yourThread.sum}'
+   # Store the threads in a list
+   # Use 2 for loops to start and join threads
+    threads = [t10,t13,t17]
+
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+
+   # Test (assert) if its sum attribute is equal
+    assert t10.sum == 45, f'The sum should equal 45 but instead was {t10.sum}'
+    assert t13.sum == 78, f'The sum should equal 78 but instead was {t13.sum}'
+    assert t17.sum == 136, f'The sum should equal 136 but instead was {t17.sum}'
 
 if __name__ == '__main__':
     main()

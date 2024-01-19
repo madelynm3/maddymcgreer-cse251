@@ -30,12 +30,31 @@ import threading
 
 # global sum
 SUM = 0
+LOCK = threading.Lock()
+
+def sum_numbers(limit, results, index):
+    local_sum = sum(range(1,limit))
+    with LOCK:
+        results[index] = local_sum
 
 def main():
 
     # If not using a global, use this list to store your results
     results = [0] * 3
-    
+
+    t1 = threading.Thread(target=sum_numbers, args=(10, results, 0))
+    t2 = threading.Thread(target=sum_numbers, args=(13, results, 1))
+    t3 = threading.Thread(target=sum_numbers, args=(17, results, 2))
+
+
+   # Store the threads in a list
+   # Use 2 for loops to start and join threads
+    threads = [t1, t2, t3]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()    
+
     # If using a global, place these asserts after the call to your summing function 
     # to check that your code is working correctly
     #assert SUM == 45, f'The sum should equal 45 but instead was {SUM}'  
@@ -44,9 +63,9 @@ def main():
     
     # If using a list object, place these asserts after the call to your summing function
     # to check that your code is working correctly
-    #assert results[0] == 45, f'The sum should equal 45 but instead was {results[0]}'  
-    #assert results[1] == 78, f'The sum should equal 78 but instead was {results[1]}'    
-    #assert results[2] == 136, f'The sum should equal 136 but instead was {results[2]}'
+    assert results[0] == 45, f'The sum should equal 45 but instead was {results[0]}'  
+    assert results[1] == 78, f'The sum should equal 78 but instead was {results[1]}'    
+    assert results[2] == 136, f'The sum should equal 136 but instead was {results[2]}'
 
 
 if __name__ == '__main__':
