@@ -32,16 +32,16 @@ import threading
 SUM = 0
 
 # Adding a lock for practice
+# Locks ensure that only one thread can execute a block of code at a time
 LOCK = threading.Lock()
 
 # The sum_numbers function takes in 3 parameters (limit (upper limit for sum calculation), 
 # results (a list for storing the calculations), index (for results in results list)).
-# sum_numbers 
-# calculates the local sum of numbers from 
+# sum_numbers calculates the local sum of numbers from 
 # 1 to limit - 1 assigned to variable 'local_sum'.
-# acquires the global lock (LOCK) using a with statement to ensure that 
+# Acquires the global lock (LOCK) using a with statement to ensure that 
 # the critical section is protected. 
-# stores the local sum at the specified index in the results list.
+# Stores the local sum at the specified index in the results list.
 def sum_numbers(limit: int, results: list, index: int):
     local_sum = sum(range(1,limit))
     with LOCK:
