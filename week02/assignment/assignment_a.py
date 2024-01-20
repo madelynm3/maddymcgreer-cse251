@@ -30,18 +30,29 @@ import threading
 
 # global sum
 SUM = 0
+
+# Adding a lock for practice
 LOCK = threading.Lock()
 
-def sum_numbers(limit, results, index):
+# The sum_numbers function takes in 3 parameters (limit (upper limit for sum calculation), 
+# results (a list for storing the calculations), index (for results in results list)).
+# sum_numbers 
+# calculates the local sum of numbers from 
+# 1 to limit - 1 assigned to variable 'local_sum'.
+# acquires the global lock (LOCK) using a with statement to ensure that 
+# the critical section is protected. 
+# stores the local sum at the specified index in the results list.
+def sum_numbers(limit: int, results: list, index: int):
     local_sum = sum(range(1,limit))
     with LOCK:
         results[index] = local_sum
 
 def main():
 
-    # If not using a global, use this list to store your results
+    # Since I am not using a global variable, I am using this list to store results
     results = [0] * 3
 
+    # Create threads
     t1 = threading.Thread(target=sum_numbers, args=(10, results, 0))
     t2 = threading.Thread(target=sum_numbers, args=(13, results, 1))
     t3 = threading.Thread(target=sum_numbers, args=(17, results, 2))

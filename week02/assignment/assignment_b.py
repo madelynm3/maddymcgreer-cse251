@@ -32,16 +32,19 @@ d. How do you get the value an object's attribute (see https://datagy.io/python-
 # DO NOT USE GLOBALS #
 ######################
 
-# Create MyThread class which will: 
-# 1. Call parent class constructor
-# 2. Store number as parameter
-# 3. Initialize sum at 0
+# Create MyThread class which:
+# inherits threading.Thread so that threads can be used for concurrent execution. 
+# calculates the sum of numbers from 1 to a specified limit (number). 
+# includes the run method that performs this calculation, and the instance variables 
+# (number and sum) can be accessed after the thread has completed its execution.
 class MyThread(threading.Thread):
-   def __init__(self, number):
+   # The constructor method. When an instance of the class is cre4ated, this is called.
+   def __init__(self, number: int):
         threading.Thread.__init__(self)
         self.number = number
         self.sum = 0
 
+   # Method that is executed once thread is started
    # Calculate sum from 1 to limit     
    def run(self):
        for i in range(1, self.number):
@@ -56,7 +59,6 @@ def main():
    # Store the threads in a list
    # Use 2 for loops to start and join threads
     threads = [t10,t13,t17]
-
     for thread in threads:
         thread.start()
     for thread in threads:
