@@ -17,7 +17,7 @@ class Request_thread(threading.Thread):
     def __init__(self, url):
         # Call the Thread class's init function
         threading.Thread.__init__(self)
-        self.url = url
+        self.url = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1"
         self.response = {}
 
     def run(self):
