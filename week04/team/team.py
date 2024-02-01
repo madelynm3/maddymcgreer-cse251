@@ -60,6 +60,8 @@ def draw_circle(tur: SlowTurtle, x: int, y: int, radius, color='red'):
 
 def draw_rectangle(tur: SlowTurtle, x: int, y: int, width, height, color='blue'):
     """Draw a rectangle"""
+    # Add lock
+    #lock = threading.Lock()
     tur.move(x, y)
     tur.setheading(0)
     tur.color(color)
@@ -71,6 +73,7 @@ def draw_rectangle(tur: SlowTurtle, x: int, y: int, width, height, color='blue')
     tur.right(90)
     tur.forward(height)
     tur.right(90)
+
 
 
 def draw_triangle(tur: SlowTurtle, x: int, y: int, side, color='green'):
@@ -118,6 +121,8 @@ def draw_rectangles(tur: SlowTurtle):
     for x in range(-300, 350, 200):
         for y in range(-300, 350, 200):
             draw_rectangle(tur, x-10, y+5, 20, 15)
+            
+
 
 def draw(tur: SlowTurtle, main_turtle: RawTurtle):
     """Draw different"""
@@ -132,12 +137,31 @@ def draw(tur: SlowTurtle, main_turtle: RawTurtle):
     print('-' * 50)
     print('Start Drawing')
     tur.move(0, 0)
+    
 
-    # TODO - modify to make these draw in threads and not draw in order (meaning, that it shouldn't draw all the squares, then the circles, etc.). It might draw 4 of the same shapes at a time, but then it should draw a different shape. For advanced users, try and see if you can figure out a way for it to not draw 4 of the same shape, but draw a different shape each time (hint: random module).
-    draw_squares(tur)
-    draw_circles(tur)
-    draw_triangles(tur)
-    draw_rectangles(tur)
+    tur.pensize(0.5)
+    draw_coord_system(tur, 0, 0, size=375)
+    tur.pensize(4)
+
+
+    lock = threading.Lock()
+    # Create threads for drawing different shapes concurrently
+    square_thread = threading.Thread(target=draw_squares, args=(tur, lock))
+    square_thread.start()
+    circle_thread = threading.Thread(target=draw_circles, args=(tur, lock))
+    circle_thread.start()
+    triangle_thread = threading.Thread(target=draw_triangles, args=(tur, lock))
+    triangle_thread.start()
+    rectangle_thread = threading.Thread(target=draw_rectangles, args=(tur, lock))
+    rectangle_thread.start()
+
+
+
+    # Wait for all threads to finish
+    square_thread.join()
+    circle_thread.join()
+    triangle_thread.join()
+    rectangle_thread.join()
 
     print('All drawing commands have been created')
 

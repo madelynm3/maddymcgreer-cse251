@@ -77,11 +77,56 @@ def is_prime(n: int):
         i += 6
     return True
 
+def count_primes_in_range(start, end):
+    global prime_count
+    global numbers_processed
+
+    local_prime_count = 0
+    local_numbers_processed = 0
+
+    for num in range(start, end + 1):
+        if is_prime(num):
+            local_prime_count += 1
+        local_numbers_processed += 1
+
+    # Update global counts
+    with lock:
+        prime_count += local_prime_count
+        numbers_processed += local_numbers_processed
+
+def run_threads():
+    threads = []
+
+    # Calculate the range for each thread
+    numbers_to_check = 110_003
+    numbers_per_thread = numbers_to_check // NUMBER_THREADS
+    start_num = 10_000_000_000
+
+    for i in range(NUMBER_THREADS - 1):
+        end_num = start_num + numbers_per_thread - 1
+        thread = threading.Thread(target=count_primes_in_range, args=(start_num, end_num))
+        threads.append(thread)
+        start_num = end_num + 1
+
+    # The last thread checks the remaining numbers
+    thread = threading.Thread(target=count_primes_in_range, args=(start_num, start_num + numbers_to_check % NUMBER_THREADS - 1))
+    threads.append(thread)
+
+    # Start all threads
+    for thread in threads:
+        thread.start()
+
+    # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
+        
 if __name__ == '__main__':
     # Start a timer
     begin_time = time.perf_counter()
 
-    # TODO write code here
+    lock = threading.Lock()
+
+    run_threads()
    
     # Use the below code to check and print your results
     assert numbers_processed == 110_003, f"Should check exactly 110,003 numbers but checked {numbers_processed}"
