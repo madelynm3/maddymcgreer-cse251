@@ -50,9 +50,6 @@ class APICallThread(threading.Thread):
         except requests.exceptions.RequestException as e:
             print(f"Error in thread {self.category}: {e}")
             data = {}
-        
-        with self.lock:
-            self.result_list[self.category] = data
 
 
 
