@@ -106,20 +106,20 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
 def run():
     global master_dict
 
-    if not os.path.exists('data.txt'):
+    if not os.path.exists("week04/assignment/data.txt"):
         print('Error the file "data.txt" not found')
         return
 
     # load dict
-    with open('data.txt') as f:
+    with open("week04/assignment/data.txt") as f:
         data = f.read()
       
     # reconstructing the data as a dictionary
     master_dict = json.loads(data)
 
     # testing
-    # print(type(master_dict['people1']))
-    # print(master_dict['films6'])
+    #print(type(master_dict['people1']))
+    #print(master_dict['films6'])
 
     print(f'Star Wars server waiting..... \nURL: {TOP_API_URL}')
 
