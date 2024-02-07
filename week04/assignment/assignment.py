@@ -15,7 +15,6 @@ Questions:
     > Dictionaries can help performance by accessing and organizing data retrieved by API calls. It uses storage so that the 94 API calls in the 94 threads can run concurrently. I used a dictionary called category_results. 
 '''
 
-
 from datetime import datetime, timedelta
 import time
 import requests
@@ -47,11 +46,12 @@ class APICallThread(threading.Thread):
             response = requests.get(self.url)
             response.raise_for_status()
             data = response.json()
+            with self.lock:
+                self.result_list[self.category] = data
         except requests.exceptions.RequestException as e:
             print(f"Error in thread {self.category}: {e}")
-            data = {}
-
-
+            with self.lock:
+                self.result_list[self.category] = {}
 
 
 def print_film_details(films, chars, planets, starships, vehicles, species):
@@ -78,81 +78,77 @@ def print_film_details(films, chars, planets, starships, vehicles, species):
     display_names('Species', species)
 
 
+def fetch_category_data(category_urls, lock):
+    '''
+    Function to fetch data for each category using multiple threads
+    '''
+    response_list = []
+    threads = []
+    
+    # Create threads for each URL in the category_urls list
+    for url in category_urls:
+        thread = APICallThread(url, url.split('/')[-2], response_list, lock)
+        threads.append(thread)
+        thread.start()
+    
+    # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
+    
+    return response_list
+
+
 def main():
-    #Start a timer
+    # Start a timer
     begin_time = time.perf_counter()
     
     print('Starting to retrieve data from the server')
 
-    # This creates parallel execution of API calls 
-    # for different categories using multiple threads. 
-    # The use of a lock ensures that the shared category_results 
-    # dictionary is updated by multiple threads.
-    
     # Add a lock for synchronization
     thread_lock = threading.Lock()
 
-    # List of categories to retrieve
-    categories = ['people', 'planets', 'starships', 'vehicles', 'species']
+    # Fetching URLs for film 6 and its details
+    t = APICallThread(TOP_API_URL, 'top_urls', {}, thread_lock)
+    t.start()
+    t.join()
+    top_urls = t.result_list
 
-    # Dictionary to store each category's results
-    category_results = {}
+    film_url = top_urls['films']
+    t = APICallThread(f'{film_url}6/', 'film_data', {}, thread_lock)
+    t.start()
+    t.join()
+    film_data = t.result_list
 
-    # Create threads for each category
-    threads = [APICallThread(f'{TOP_API_URL}/{category}/', category, category_results, thread_lock) for category in categories]
+    # Extract URLs for different categories
+    char_urls = film_data['characters']
+    planet_urls = film_data['planets']
+    starship_urls = film_data['starships']
+    vehicle_urls = film_data['vehicles']
+    species_urls = film_data['species']
 
-    # Start all threads
-    for thread in threads:
-        thread.start()
-
-    # Wait for all threads to finish
-    for thread in threads:
-        thread.join()
+    # Fetch data for each category
+    category_urls = [char_urls, planet_urls, starship_urls, vehicle_urls, species_urls]
+    category_results = fetch_category_data(category_urls, thread_lock)
 
     # Print the results for each category
-    for category in categories:
-        print(f'{category} result: {category_results.get(category, {})}')
+    for category, result in category_results.items():
+        print(f'{category} result: {result}')
 
-    # film_result dictionary collects the 
-    # details about the sixth film.
-    film_url = f'{TOP_API_URL}/films/6'
-    film_result = {}
-    film_thread = APICallThread(film_url, 'films', film_result, thread_lock)
-    film_thread.start()
-    film_thread.join()
+    # Display film details
+    print_film_details(film_data, category_results['characters'], category_results['planets'], 
+                       category_results['starships'], category_results['vehicles'], 
+                       category_results['species'])
 
-    # Print the result for film 6
-    print(f'Film 6 result: {film_result.get("films", {})}')
-    
-    # This function obtains the data for displaying
-    # film details using the print_film_details function.
-    def extract_film_data(category_results):
-      # Get data for each category
-      film_data = category_results.get('films', {})
-      people_data = category_results.get('people', [])
-      chars = people_data[0].get('characters', []) if people_data else []
-      planets = film_data.get('planets', [])
-      starships = film_data.get('starships', [])
-      vehicles = film_data.get('vehicles', [])
-      species = film_data.get('species', [])
-
-      return film_data, chars, planets, starships, vehicles, species
-
-    # Call the display function
-    film_data, chars, planets, starships, vehicles, species = extract_film_data(category_results)
-    print_film_details(film_data, chars, planets, starships, vehicles, species)
-
+    # Print statistics
     print(f'There were {call_count} calls to the server')
     total_time = time.perf_counter() - begin_time
     total_time_str = "{:.2f}".format(total_time)
     print(f'Total time = {total_time_str} sec')
     
-    # If you do have a slow computer, then put a comment in your code about why you are changing
-    # the total_time limit. Note: 90+ seconds means that you are not doing multithreading
+
     assert total_time < 15, "Unless you have a super slow computer, it should not take more than 15 seconds to get all the data."
-    
     assert call_count == 94, "It should take exactly 94 threads to get all the data"
-    
+
 
 if __name__ == "__main__":
     main()
