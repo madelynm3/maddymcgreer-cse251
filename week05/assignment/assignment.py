@@ -13,15 +13,21 @@ Requirements
 Questions:
 1. Do you need to use locks around accessing the queue object when using multiple threads? 
    Why or why not?
-   >
-   >
+   > Yes, because a queue is usually made to be thread-safe, which
+   > means it provides ways to to handle concurrent access from 
+   > multiple threads without damaging the data structure/ cause race
+   > conditions.
 2. How would you define a semaphore in your own words?
-   >
-   >
+   > Semaphores are a type of synchronization primitive. Which means
+   > shared and exclusive locks. It is a variable/abtract data type that
+   > controls access to a shared resource using multiple threads and
+   > avoid problems in a concurrent system.
 3. Read https://stackoverflow.com/questions/2407589/what-does-the-term-blocking-mean-in-programming.
    What does it mean that the "join" function is a blocking function? Why do we want to block?
-   >
-   >
+   > The join function is a blocking function because it stops the execution of the calling 
+   > thread until the joined thread finishes. We want to use blocking because it is useful for
+   > operations where waiting for certain conditions is needed, such as I/O, 
+   > thread synchronization, and data management.
    >
 '''
 
