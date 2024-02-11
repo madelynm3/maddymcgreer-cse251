@@ -1,20 +1,3 @@
-'''
-Requirements
-1. Write a multithreaded program that calls a local web server. The web server is 
-   provided to you. It will return data about the Star Wars movies.
-2. You will make 94 calls to the web server, using 94 threads to get the data.
-3. Using a new thread each time, obtain a list of the characters, planets, 
-   starships, vehicles, and species of the sixth Star Wars movie.
-3. Use the provided print_film_details function to print out the data 
-   (you can modify it if you need).
-   
-Questions:
-1. Is this assignment an IO Bound or CPU Bound problem (see https://stackoverflow.com/questions/868568/what-do-the-terms-cpu-bound-and-i-o-bound-mean)?
-    > This assignment is IO Bound. API calls are usually IO operations becasue the program waits to respond to the server with the data. Since this assignment is waiting heavily on responses from the server, this would be primarily an IO bound problem.
-2. Review dictionaries (see https://isaaccomputerscience.org/concepts/dsa_datastruct_dictionary). How could a dictionary be used on this assignment to improve performance?
-    > Dictionaries can help performance by accessing and organizing data retrieved by API calls. It uses storage so that the 94 API calls in the 94 threads can run concurrently. I used a dictionary called category_results. 
-'''
-
 from datetime import datetime, timedelta
 import time
 import requests
@@ -51,7 +34,7 @@ def print_film_details(urls) -> list[Any]:
     threads = []
     
     for url in urls:
-        t = Request_thread(url)
+        t = requests.get(url)
         threads.append(t)
         t.start()
         
@@ -113,10 +96,10 @@ def main():
     thread_lock = threading.Lock()
 
     # Fetching URLs for film 6 and its details
-    t = APICallThread(TOP_API_URL, 'top_urls', {}, thread_lock)
+    t = APICallThread('top_urls')
     t.start()
     t.join()
-    top_urls = t.result_list
+    top_urls = t.response_list
 
     film_url = top_urls['films']
     t = APICallThread(f'http://127.0.0.1:8790/films/6/', 'film_data', {}, thread_lock)
