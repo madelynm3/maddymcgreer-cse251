@@ -97,16 +97,25 @@ class QueueTwoFiftyOne():
 class Manufacturer(threading.Thread):
     """ This is a manufacturer.  It will create cars and place them on the car queue """
 
-    def __init__(self, queue, car_count):
+   # Contructor takes 4 parameters: self, queue, car_count, semaphore. 
+   # Call constructor of superclass to ensure intitalization
+   # Queue paramater assigned to variable to store objects
+   # car_count parameter assigned to variable to store the count
+    def __init__(self, queue, car_count, semaphore):
         super().__init__()
         self.queue = queue
         self.car_count = car_count
+        self.semaphore = semaphore
 
+   # Iterates through car_count and places the
+   # cars in the queue
     def run(self):
         for i in range(self.car_count):
-            for i in range(self.car_count):
-                car = Car()
-                self.queue.put(car)
+           car = Car()
+           self.semaphore.acquire()
+           self.queue.put(car)
+           self.semaphore.release()
+
             """
             create a car
             place the car on the queue
@@ -119,13 +128,31 @@ class Manufacturer(threading.Thread):
 class Dealership(threading.Thread):
     """ This is a dealership that receives cars """
 
-    def __init__(self, queue):
+   # Call superclass's instructor and add queue and semaphore attributes
+    def __init__(self, queue, semaphore):
         super().__init__()
         self.queue = queue
+        self.semaphore = semaphore
 
+   # Initiates an infinite loop in order to continuously update the queue
+   # Acquires semaphore to access queue, checks if empty, get car from
+   # queue, release semaphore.
     def run(self):
         while True:
-            car = self.queue.get()
+            self.semaphore.acquire()
+            if self.queue.size() > 0:
+                car = self.queue.get()
+                self.semaphore.release()
+                # Process car
+                print(f"Received car: {car.make} {car.model} {car.year}")
+                # Update queue
+                queue_size = self.queue.size()
+                if queue_size <= MAX_QUEUE_SIZE:
+                    queue_stats[queue_size - 1] += 1
+                else:
+                    print("Queue size exceeds size limit.")
+            else:
+                self.semaphore.release()
             """
             take the car from the queue
             signal the factory that there is an empty slot in the queue
@@ -143,15 +170,15 @@ def main():
     # random amount of cars to produce
     CARS_TO_PRODUCE = random.randint(500, 600)
 
+   # Create semaphores
+    semaphore = threading.Semaphore(MAX_QUEUE_SIZE)
+
+    # Create queue (using class QueueTwoFiftyOne)
     queue = QueueTwoFiftyOne()
-    manufacturer = Manufacturer(queue, CARS_TO_PRODUCE)
-    dealership = Dealership(queue)
+   
+    # Create lock
+    lock = threading.Lock()
 
-    manufacturer.start()
-    dealership.start()
-
-    manufacturer.join()
-    dealership.join()
 
     # This tracks the length of the car queue during receiving cars by the dealership,
     # the index of the list is the size of the queue. Update this list each time the
@@ -159,8 +186,19 @@ def main():
     # queue size).
     queue_stats = [0] * MAX_QUEUE_SIZE
 
-    for _ in range(CARS_TO_PRODUCE):
-        queue_stats[min(queue.size(), MAX_QUEUE_SIZE - 1)] += 1
+   # Create manufacturer and dealership
+    manufacturer = Manufacturer(queue, CARS_TO_PRODUCE, semaphore, lock)
+    dealership = Dealership(queue, semaphore, lock)
+
+    # Start manufacturer and dealership threads
+    manufacturer.start()
+    dealership.start()
+
+    # Wait for manufacturer and dealership to complete
+    manufacturer.join()
+    dealership.join()
+
+   
 
     total_time = "{:.2f}".format(time.perf_counter() - begin_time)
     print(f'Total time = {total_time} sec')
