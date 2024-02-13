@@ -35,6 +35,7 @@ from datetime import datetime
 import time
 import threading
 import random
+import requests
 # DO NOT import queue
 
 from plots import Plots
@@ -101,26 +102,32 @@ class Manufacturer(threading.Thread):
    # Call constructor of superclass to ensure intitalization
    # Queue paramater assigned to variable to store objects
    # car_count parameter assigned to variable to store the count
-    def __init__(self, queue, car_count, semaphore):
+    def __init__(self, queue: QueueTwoFiftyOne, semaphore: threading.Semaphore, semaphore_empty: threading.Semaphore, queue_stats, lock):
         super().__init__()
         self.queue = queue
-        self.car_count = car_count
+        self.semaphore_empty = semaphore_empty
         self.semaphore = semaphore
+        self.stats = queue_stats
+        self.lock = lock
+
 
    # Iterates through car_count and places the
    # cars in the queue
     def run(self):
         for i in range(self.car_count):
            car = Car()
-           self.semaphore.acquire()
-           self.queue.put(car)
-           self.semaphore.release()
+           with self.lock:
+               self.queue.put(car)
 
-            """
-            create a car
-            place the car on the queue
-            signal the dealer that there is a car on the queue
-           """
+           self.semaphore.release()
+        
+        self.semaphore.acquire()
+
+        self.queue.put(None)
+
+        self.semaphore_empty.release()
+        print(">>>>>>>>>>>>>>>>>> MANUFACTURER ENDS")
+
 
         # signal the dealer that there there are no more cars
 
@@ -129,10 +136,13 @@ class Dealership(threading.Thread):
     """ This is a dealership that receives cars """
 
    # Call superclass's instructor and add queue and semaphore attributes
-    def __init__(self, queue, semaphore):
+    def __init__(self, queue: QueueTwoFiftyOne, semaphore: threading.Semaphore, semaphore_empty: threading.Semaphore, queue_stats, lock):
         super().__init__()
         self.queue = queue
+        self.semaphore_empty = semaphore_empty
         self.semaphore = semaphore
+        self.stats = queue_stats
+        self.lock = lock
 
    # Initiates an infinite loop in order to continuously update the queue
    # Acquires semaphore to access queue, checks if empty, get car from
@@ -140,19 +150,14 @@ class Dealership(threading.Thread):
     def run(self):
         while True:
             self.semaphore.acquire()
-            if self.queue.size() > 0:
+            with self.lock:
                 car = self.queue.get()
-                self.semaphore.release()
-                # Process car
-                print(f"Received car: {car.make} {car.model} {car.year}")
-                # Update queue
-                queue_size = self.queue.size()
-                if queue_size <= MAX_QUEUE_SIZE:
-                    queue_stats[queue_size - 1] += 1
-                else:
-                    print("Queue size exceeds size limit.")
-            else:
-                self.semaphore.release()
+                if car == None:
+                    break
+                self.stats[self.queue.size()] += 1
+            
+            self.semaphore.release()
+
             """
             take the car from the queue
             signal the factory that there is an empty slot in the queue
@@ -161,24 +166,22 @@ class Dealership(threading.Thread):
             # Sleep a little after selling a car
             # Last statement in this for loop - don't change
             time.sleep(random.random() / (SLEEP_REDUCE_FACTOR))
+        
+        print(">>>>>>>>>>>>>>>>>>>> DEALERSHIP ENDS")
 
 
 def main():
-    # Start a timer
-    begin_time = time.perf_counter()
-
     # random amount of cars to produce
     CARS_TO_PRODUCE = random.randint(500, 600)
+
+    # Create queue (using class QueueTwoFiftyOne)
+    queue = QueueTwoFiftyOne()
 
    # Create semaphores
     semaphore = threading.Semaphore(MAX_QUEUE_SIZE)
 
-    # Create queue (using class QueueTwoFiftyOne)
-    queue = QueueTwoFiftyOne()
-   
-    # Create lock
-    lock = threading.Lock()
-
+    # Block empty queue
+    semaphore_empty = threading.Semaphore(0)
 
     # This tracks the length of the car queue during receiving cars by the dealership,
     # the index of the list is the size of the queue. Update this list each time the
@@ -186,22 +189,21 @@ def main():
     # queue size).
     queue_stats = [0] * MAX_QUEUE_SIZE
 
+    # Create lock
+    lock = threading.Lock()
+
    # Create manufacturer and dealership
-    manufacturer = Manufacturer(queue, CARS_TO_PRODUCE, semaphore, lock)
-    dealership = Dealership(queue, semaphore, lock)
+    factory = Manufacturer(CARS_TO_PRODUCE, queue, semaphore_empty, semaphore, lock)
+    dealership = Dealership(queue, semaphore_empty, semaphore, queue_stats, lock)
 
     # Start manufacturer and dealership threads
-    manufacturer.start()
+    factory.start()
     dealership.start()
 
     # Wait for manufacturer and dealership to complete
-    manufacturer.join()
+    factory.join()
     dealership.join()
 
-   
-
-    total_time = "{:.2f}".format(time.perf_counter() - begin_time)
-    print(f'Total time = {total_time} sec')
 
     # Plot car count vs queue size
     xaxis = [i for i in range(1, MAX_QUEUE_SIZE + 1)]
