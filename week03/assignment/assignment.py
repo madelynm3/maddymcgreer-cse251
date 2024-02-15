@@ -26,15 +26,15 @@ Psuedocode:
    found. 
 
 Questions:
-1. Time to run using 1 thread =
-2. Time to run using 5 threads =
-3. Time to run using 10 threads =
+1. Time to run using 1 thread = 16.46 sec
+2. Time to run using 5 threads = 5.05 sec
+3. Time to run using 10 threads = 4.67 sec
 4. Based on your study of the GIL (see https://realpython.com/python-gil), 
    what conclusions can you draw about the similarity of the times (short answer)?
-   >
-   >
+   > The time is improved when using multiple threads instead of one.
+   > When multiple threads are used, the workload can be distributed across the CPU making the execution time faster. 
 5. Is this assignment an IO Bound or CPU Bound problem (see https://stackoverflow.com/questions/868568/what-do-the-terms-cpu-bound-and-i-o-bound-mean)?
-   >
+   > This assignment is a CPU Bound problem because it is performing computations which utilizes CPU resources. 
 '''
 
 from datetime import datetime, timedelta
