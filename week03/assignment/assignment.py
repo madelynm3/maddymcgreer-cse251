@@ -26,9 +26,9 @@ Psuedocode:
    found. 
 
 Questions:
-1. Time to run using 1 thread = 16.46 sec
-2. Time to run using 5 threads = 5.05 sec
-3. Time to run using 10 threads = 4.67 sec
+1. Time to run using 1 thread = 29.50 sec
+2. Time to run using 5 threads = 57.54 sec
+3. Time to run using 10 threads = 43.95 sec
 4. Based on your study of the GIL (see https://realpython.com/python-gil), 
    what conclusions can you draw about the similarity of the times (short answer)?
    > The time is improved when using multiple threads instead of one.
@@ -36,6 +36,7 @@ Questions:
 5. Is this assignment an IO Bound or CPU Bound problem (see https://stackoverflow.com/questions/868568/what-do-the-terms-cpu-bound-and-i-o-bound-mean)?
    > This assignment is a CPU Bound problem because it is performing computations which utilizes CPU resources. 
 '''
+
 
 from datetime import datetime, timedelta
 import math
@@ -47,8 +48,6 @@ prime_count = 0
 
 # Global count of the numbers examined
 numbers_processed = 0
-
-NUMBER_THREADS = 10
 
 def is_prime(n: int):
     """
@@ -94,23 +93,27 @@ def count_primes_in_range(start, end):
         prime_count += local_prime_count
         numbers_processed += local_numbers_processed
 
-def run_threads():
+def run_threads(number_threads):
     threads = []
 
-    # Calculate the range for each thread
-    numbers_to_check = 110_003
-    numbers_per_thread = numbers_to_check // NUMBER_THREADS
+    # Constants
     start_num = 10_000_000_000
+    end_num = 10_000_110_003
+    total_numbers = end_num - start_num
 
-    for i in range(NUMBER_THREADS - 1):
-        end_num = start_num + numbers_per_thread - 1
-        thread = threading.Thread(target=count_primes_in_range, args=(start_num, end_num))
+    # Calculate the range for each thread
+    numbers_per_thread = total_numbers // number_threads
+    remaining_numbers = total_numbers % number_threads
+
+    current_start = start_num
+    for i in range(number_threads):
+        current_end = current_start + numbers_per_thread - 1
+        if remaining_numbers > 0:
+            current_end += 1
+            remaining_numbers -= 1
+        thread = threading.Thread(target=count_primes_in_range, args=(current_start, current_end))
         threads.append(thread)
-        start_num = end_num + 1
-
-    # The last thread checks the remaining numbers
-    thread = threading.Thread(target=count_primes_in_range, args=(start_num, start_num + numbers_to_check % NUMBER_THREADS - 1))
-    threads.append(thread)
+        current_start = current_end + 1
 
     # Start all threads
     for thread in threads:
@@ -119,15 +122,18 @@ def run_threads():
     # Wait for all threads to finish
     for thread in threads:
         thread.join()
-        
+
 if __name__ == '__main__':
     # Start a timer
     begin_time = time.perf_counter()
 
     lock = threading.Lock()
 
-    run_threads()
-   
+    # Define the number of threads
+    NUMBER_THREADS = 10
+
+    run_threads(NUMBER_THREADS)
+
     # Use the below code to check and print your results
     assert numbers_processed == 110_003, f"Should check exactly 110,003 numbers but checked {numbers_processed}"
     assert prime_count == 4764, f"Should find exactly 4764 primes but found {prime_count}"
