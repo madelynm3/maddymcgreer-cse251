@@ -102,13 +102,14 @@ class Manufacturer(threading.Thread):
    # Call constructor of superclass to ensure intitalization
    # Queue paramater assigned to variable to store objects
    # car_count parameter assigned to variable to store the count
-    def __init__(self, queue: QueueTwoFiftyOne, semaphore: threading.Semaphore, semaphore_empty: threading.Semaphore, queue_stats, lock):
+    def __init__(self, queue: QueueTwoFiftyOne, car_count: int, semaphore: threading.Semaphore, semaphore_empty: threading.Semaphore, queue_stats, lock):
         super().__init__()
         self.queue = queue
         self.semaphore_empty = semaphore_empty
         self.semaphore = semaphore
         self.stats = queue_stats
         self.lock = lock
+        self.car_count = car_count
 
 
    # Iterates through car_count and places the
@@ -152,9 +153,11 @@ class Dealership(threading.Thread):
             self.semaphore.acquire()
             with self.lock:
                 car = self.queue.get()
-                if car == None:
+                if car is None:
                     break
-                self.stats[self.queue.size()] += 1
+                queue_size = min(self.queue.size(), MAX_QUEUE_SIZE - 1)
+                self.stats[queue_size] += 1
+                print("Got a car. Queue size:", queue_size)
             
             self.semaphore.release()
 
@@ -193,7 +196,7 @@ def main():
     lock = threading.Lock()
 
    # Create manufacturer and dealership
-    factory = Manufacturer(CARS_TO_PRODUCE, queue, semaphore_empty, semaphore, lock)
+    factory = Manufacturer(queue, CARS_TO_PRODUCE, semaphore, semaphore_empty, queue_stats, lock)
     dealership = Dealership(queue, semaphore_empty, semaphore, queue_stats, lock)
 
     # Start manufacturer and dealership threads
