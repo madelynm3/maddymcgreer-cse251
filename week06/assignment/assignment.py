@@ -84,65 +84,86 @@ class QueueTwoFiftyOne():
 class Manufacturer(threading.Thread):
     """ This is a manufacturer.  It will create cars and place them on the car queue """
 
-    def __init__(self):
+    def __init__(self, car_queue, semaphore, barrier, manufacturer_id, manufacturer_stats, cars_to_produce):
+        super().__init__() 
         self.cars_to_produce = random.randint(200, 300)     # Don't change
+        self.car_queue = car_queue
+        self.semaphore = semaphore
+        self.barrier = barrier
+        self.manufacturer_id = manufacturer_id
+        self.manufacturer_stats = manufacturer_stats
+        self.cars_to_produce = cars_to_produce
 
     def run(self):
-        # TODO produce the cars, the send them to the dealerships
+        for _ in range(self.cars_to_produce):
+            self.semaphore.acquire()
+            car = Car()
+            self.car_queue.put(car)
+            self.manufacturer_stats[self.manufacturer_id] += 1
+            self.semaphore.release()
 
-        # TODO wait until all of the manufacturers are finished producing cars
+        self.barrier.wait()
 
-        # TODO "Wake up/signal" the dealerships one more time. Send the stop flag.
-        # Select one manufacturer to do this (hint: pass in and use the manufacturer_id)
-        pass
+        if self.manufacturer_id == 0:
+            for _ in range(MAX_QUEUE_SIZE):
+                self.semaphore.acquire()
+                self.car_queue.put(None)  # Signal end of production
+                self.semaphore.release()
 
 
 class Dealership(threading.Thread):
     """ This is a dealer that receives cars """
 
-    def __init__(self):
-        pass
+    def __init__(self, car_queue, semaphore, dealer_id, dealer_stats):
+        super().__init__()
+        self.car_queue = car_queue
+        self.semaphore = semaphore
+        self.dealer_id = dealer_id
+        self.dealer_stats = dealer_stats
 
     def run(self):
         while True:
-            # TODO handle a car
+            with self.semaphore:  # Acquire the semaphore using a with statement
+                car = self.car_queue.get()
+            
+
+                if car is None:
+                    break
+                self.semaphore.release()
+                self.dealer_stats[self.dealer_id] += 1
 
             # Sleep a little - don't change.  This is the last line of the loop
             time.sleep(random.random() / (SLEEP_REDUCE_FACTOR))
 
 
 def run_production(manufacturer_count, dealer_count):
-    """ This function will do a production run with the number of
-        manufacturers and dealerships passed in as arguments.
-    """
-
     # Start a timer
+    CARS_TO_PRODUCE = random.randint(500, 600)
     begin_time = time.perf_counter()
-
-    # TODO Create semaphore(s)
-    # TODO Create queue
-    # TODO Create lock(s) -- if needed
-    # TODO Create barrier(s)
+    car_queue = QueueTwoFiftyOne()
+    semaphore = threading.Semaphore(MAX_QUEUE_SIZE)
     barrier = threading.Barrier(manufacturer_count)
+    dealer_stats = [0] * dealer_count
+    manufacturer_stats = [0] * manufacturer_count
 
-    # This is used to track the number of cars receives by each dealer
-    dealer_stats = list([0] * dealer_count)
-    manufacturer_stats = list([0] * manufacturer_count)
-    
-    # TODO create your manufacturers, each manufacturer will create CARS_TO_CREATE_PER_MANUFACTURER
+    manufacturers = [Manufacturer(car_queue, semaphore, barrier, i, manufacturer_stats, CARS_TO_PRODUCE) for i in range(manufacturer_count)]
+    dealerships = [Dealership(car_queue, semaphore, i, dealer_stats) for i in range(dealer_count)]
 
-    # TODO create your dealerships
+    for dealership in dealerships:
+        dealership.start()
 
-    # TODO Start all dealerships
+    for manufacturer in manufacturers:
+        manufacturer.start()
 
-    # TODO Start all manufacturers
+    for manufacturer in manufacturers:
+        manufacturer.join()
 
-    # TODO Wait for manufacturers and dealerships to complete
+    for dealership in dealerships:
+        dealership.join()
 
     run_time = time.perf_counter() - begin_time
-
-    # This function must return the following - only change the variable names, if necessary.
     return (run_time, car_queue.get_max_size(), dealer_stats, manufacturer_stats)
+
 
 
 def main():
