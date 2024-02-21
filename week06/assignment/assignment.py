@@ -13,10 +13,17 @@ Requirements
    
 Questions:
 1. How would you define a barrier in your own words?
-   >
+   > A barrier is a synchronization primitive that allows multiple 
+   > threads to wait at a certain point until all threads have reached 
+   > that point. Once all threads have reached the barrier, 
+   > they can proceed with their execution.
    >
 2. Why is a barrier necessary in this assignment?
-   >
+   > A barrier is necessary in this assignment to ensure that all manufacturers 
+   > finish producing cars before dealerships start selling them. Without a barrier, 
+   > there's a possibility that some dealerships may start selling cars before 
+   > all manufacturers have finished producing them, leading to incorrect 
+   > statistics or race conditions.
    >
 '''
 
