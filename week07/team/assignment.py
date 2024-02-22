@@ -63,7 +63,10 @@ def create_new_frame(image_file, green_file, process_file):
 
 
 # TODO add any functions you need here
-
+def process_task(data) -> None:
+    create_new_frame(data[0], data[1], data[2])
+def track_cpu():
+    pass
 
 
 if __name__ == '__main__':
@@ -73,28 +76,32 @@ if __name__ == '__main__':
     # the time it takes to process the images given this number of CPUs.
     xaxis_cpus = []
     yaxis_times = []
+    
 
     # process the 10th frame (TODO modify this to loop over all frames)
-    image_number = 10
+    #image_number = 10
+    for image_number in range(1, FRAME_COUNT):
+      image_file = rf'elephant/image{image_number:03d}.png'
+      green_file = rf'green/image{image_number:03d}.png'
+      process_file = rf'processed/image{image_number:03d}.png'
+      yaxis_times.append((image_file, green_file, process_file))
+      start_time = timeit.default_timer()
+      create_new_frame(image_file, green_file, process_file)
+    with mp.Pool(FRAME_COUNT) as pool: # Creates pool process, takes int
+        pool.map(process_task,yaxis_times)
 
-    image_file = rf'elephant/image{image_number:03d}.png'
-    green_file = rf'green/image{image_number:03d}.png'
-    process_file = rf'processed/image{image_number:03d}.png'
-
-    start_time = timeit.default_timer()
-    create_new_frame(image_file, green_file, process_file)
     print(f'\nTime To Process all images = {timeit.default_timer() - start_time}')
 
     print(f'Total Time for ALL processing: {timeit.default_timer() - all_process_time}')
 
     # create plot of results and also save it to a PNG file
-    plt.plot(xaxis_cpus, yaxis_times, label=f'{FRAME_COUNT}')
+    #plt.plot(xaxis_cpus, yaxis_times, label=f'{FRAME_COUNT}')
     
-    plt.title('CPU Core yaxis_times VS CPUs')
-    plt.xlabel('CPU Cores')
-    plt.ylabel('Seconds')
-    plt.legend(loc='best')
+    #plt.title('CPU Core yaxis_times VS CPUs')
+    #plt.xlabel('CPU Cores')
+    #plt.ylabel('Seconds')
+    #plt.legend(loc='best')
 
-    plt.tight_layout()
-    plt.savefig(f'Plot for {FRAME_COUNT} frames.png')
-    plt.show()
+    #plt.tight_layout()
+    #plt.savefig(f'Plot for {FRAME_COUNT} frames.png')
+    #plt.show()
