@@ -225,6 +225,7 @@ def main():
     bagger_to_assembler_conn, assembler_to_bagger_conn = mp.Pipe()
     assembler_to_wrapper_conn, wrapper_to_assembler_conn = mp.Pipe()
 
+
     # Count the number of gifts
     gift_count = mp.Value('i', 0)
 
@@ -254,12 +255,20 @@ def main():
     for process in processes:
         process.join()
 
+    # Close pipes
+    creator_to_bagger_conn.close()
+    bagger_to_creator_conn.close()
+    bagger_to_assembler_conn.close()
+    assembler_to_bagger_conn.close()
+    assembler_to_wrapper_conn.close()
+    wrapper_to_assembler_conn.close()
+
     display_final_boxes(BOXES_FILENAME)
 
     # Print the number of gifts created.
     print(f'Number of gifts created: {gift_count.value}')
     
-    
+    # End timer
     end_time = time.perf_counter()
     elapsed_time = end_time - begin_time
     print(f"Elapsed time: {elapsed_time} seconds")
