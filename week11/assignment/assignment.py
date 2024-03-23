@@ -54,6 +54,7 @@ Instructions:
   for example: philosophers[i] needs forks[i] and forks[i+1] to eat. Hint, they are
   sitting in a circle.
 '''
+
 import time
 import threading
 
@@ -77,24 +78,26 @@ class Waiter:
         self.forks[(philosopher_id + 1) % PHILOSOPHERS].release()
         self.available.release()
 
-def philosopher_behavior(philosopher_id, waiter):
+def philosopher_behavior(name, waiter):
     meals_eaten = 0
     while meals_eaten < MAX_MEALS:
+        philosopher_id = name.index(name)
         if waiter.request_to_eat(philosopher_id):
-            print(f"Philosopher {philosopher_id} is eating.")
+            print(f"{name} is eating.")
             time.sleep(1 + philosopher_id % 3)  # Eating for 1 to 3 seconds
             waiter.finished_eating(philosopher_id)
             meals_eaten += 1
         else:
-            print(f"Philosopher {philosopher_id} is waiting.")
+            print(f"{name} is waiting.")
             time.sleep(1 + philosopher_id % 3)  # Waiting for 1 to 3 seconds
-    print(f"Philosopher {philosopher_id} finished eating {MAX_MEALS} meals.")
+    print(f"{name} finished eating {MAX_MEALS} meals.")
 
 def main():
     waiter = Waiter()
+    philosopher_names = ["Hegel", "Sartre", "Nietzsche", "Camus", "Plato"]  # Names of philosophers
     philosophers = []
-    for i in range(PHILOSOPHERS):
-        philosopher = threading.Thread(target=philosopher_behavior, args=(i, waiter))
+    for name in philosopher_names:
+        philosopher = threading.Thread(target=philosopher_behavior, args=(name, waiter))
         philosopher.start()
         philosophers.append(philosopher)
 
