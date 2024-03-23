@@ -79,22 +79,33 @@ class Waiter:
         self.available.release()
 
 def philosopher_behavior(name, waiter):
+    """
+    Simulates philospher behavior and interactions
+    between philospher and waiter.
+    
+    Parameters:
+        name (str): Philosopher name
+        waiter (Waiter): Waiter controlling access to forks
+    """
     meals_eaten = 0
     while meals_eaten < MAX_MEALS:
         philosopher_id = name.index(name)
         if waiter.request_to_eat(philosopher_id):
             print(f"{name} is eating.")
-            time.sleep(1 + philosopher_id % 3)  # Eating for 1 to 3 seconds
+            time.sleep(1 + philosopher_id % 3)  # Eating delay
             waiter.finished_eating(philosopher_id)
             meals_eaten += 1
         else:
             print(f"{name} is waiting.")
-            time.sleep(1 + philosopher_id % 3)  # Waiting for 1 to 3 seconds
+            time.sleep(1 + philosopher_id % 3)  # Waiting delay
     print(f"{name} finished eating {MAX_MEALS} meals.")
 
 def main():
+    """
+    Main function to demonstrate philosopher simulation.
+    """
     waiter = Waiter()
-    philosopher_names = ["Hegel", "Sartre", "Nietzsche", "Camus", "Plato"]  # Names of philosophers
+    philosopher_names = ["Hegel", "Sartre", "Nietzsche", "Camus", "Plato"]  # Names of philosophers because I think it's funny
     philosophers = []
     for name in philosopher_names:
         philosopher = threading.Thread(target=philosopher_behavior, args=(name, waiter))
