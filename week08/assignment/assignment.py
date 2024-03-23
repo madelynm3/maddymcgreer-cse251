@@ -148,10 +148,10 @@ class Assembler(mp.Process):
 
     def run(self):
         bag = self.wrapper_conn.recv()
-        while True:
-            bag = self.wrapper_conn.recv()
-            if bag is None:
-                break
+        while bag is not None:
+            #bag = self.wrapper_conn.recv()
+            #if bag is None:
+                #break
             large_marble = random.choice(self.marble_names)
             gift = Gift(large_marble, bag)
             self.wrapper_conn.send(gift)
