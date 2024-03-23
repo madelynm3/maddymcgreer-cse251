@@ -54,22 +54,52 @@ Instructions:
   for example: philosophers[i] needs forks[i] and forks[i+1] to eat. Hint, they are
   sitting in a circle.
 '''
-
 import time
 import threading
 
 PHILOSOPHERS = 5
 MAX_MEALS = PHILOSOPHERS * 5
 
-def main():
-    # TODO - create the waiter (A class would be best here).
-    # TODO - create the forks (What kind of object should a fork be?).
-    # TODO - create PHILOSOPHERS philosophers.
-    # TODO - Start them eating and thinking.
-    # TODO - Display how many times each philosopher ate, 
-    #        how long they spent eating, and how long they spent thinking.
+class Waiter:
+    def __init__(self):
+        self.forks = [threading.Lock() for _ in range(PHILOSOPHERS)]
+        self.available = threading.Semaphore(PHILOSOPHERS - 1)
 
-    pass
+    def request_to_eat(self, philosopher_id):
+        if self.available.acquire(timeout=1):
+            self.forks[philosopher_id].acquire()
+            self.forks[(philosopher_id + 1) % PHILOSOPHERS].acquire()
+            return True
+        return False
+
+    def finished_eating(self, philosopher_id):
+        self.forks[philosopher_id].release()
+        self.forks[(philosopher_id + 1) % PHILOSOPHERS].release()
+        self.available.release()
+
+def philosopher_behavior(philosopher_id, waiter):
+    meals_eaten = 0
+    while meals_eaten < MAX_MEALS:
+        if waiter.request_to_eat(philosopher_id):
+            print(f"Philosopher {philosopher_id} is eating.")
+            time.sleep(1 + philosopher_id % 3)  # Eating for 1 to 3 seconds
+            waiter.finished_eating(philosopher_id)
+            meals_eaten += 1
+        else:
+            print(f"Philosopher {philosopher_id} is waiting.")
+            time.sleep(1 + philosopher_id % 3)  # Waiting for 1 to 3 seconds
+    print(f"Philosopher {philosopher_id} finished eating {MAX_MEALS} meals.")
+
+def main():
+    waiter = Waiter()
+    philosophers = []
+    for i in range(PHILOSOPHERS):
+        philosopher = threading.Thread(target=philosopher_behavior, args=(i, waiter))
+        philosopher.start()
+        philosophers.append(philosopher)
+
+    for philosopher in philosophers:
+        philosopher.join()
 
 if __name__ == '__main__':
     main()
