@@ -235,31 +235,35 @@ def main():
     print('Create the processes')
 
     # Create the processes (ie., classes above)
-    marble_creator = Marble_Creator(bagger_to_creator_conn, settings[MARBLE_COUNT], settings[CREATOR_DELAY])
-    bagger = Bagger(assembler_to_bagger_conn, settings[BAG_COUNT], settings[BAGGER_DELAY])
-    assembler = Assembler(wrapper_to_assembler_conn, settings[ASSEMBLER_DELAY])
-    wrapper = Wrapper(wrapper_to_assembler_conn, BOXES_FILENAME, settings[WRAPPER_DELAY])
+    processes = [
+        Marble_Creator(bagger_to_creator_conn, settings[MARBLE_COUNT], settings[CREATOR_DELAY]),
+        Bagger(assembler_to_bagger_conn, settings[BAG_COUNT], settings[BAGGER_DELAY]),
+        Assembler(wrapper_to_assembler_conn, settings[ASSEMBLER_DELAY]),
+        Wrapper(wrapper_to_assembler_conn, BOXES_FILENAME, settings[WRAPPER_DELAY])
+    ]
 
 
     print('Starting the processes')
     # Start processes
-    marble_creator.start()
-    bagger.start()
-    assembler.start()
-    wrapper.start()
+    for process in processes:
+        process.start()
 
 
     print('Waiting for processes to finish')
     # Join processes
-    marble_creator.join()
-    bagger.join()
-    assembler.join()
-    wrapper.join()
+    for process in processes:
+        process.join()
 
     display_final_boxes(BOXES_FILENAME)
 
     # Print the number of gifts created.
     print(f'Number of gifts created: {gift_count.value}')
+    
+    
+    end_time = time.perf_counter()
+    elapsed_time = end_time - begin_time
+    print(f"Elapsed time: {elapsed_time} seconds")
+
 
 
 if __name__ == '__main__':
