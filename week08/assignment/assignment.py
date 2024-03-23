@@ -111,6 +111,8 @@ class Marble_Creator(mp.Process):
             time.sleep(self.creator_delay)
         self.bagger_conn.close()
 
+        
+
 
 class Bagger(mp.Process):
     """ Receives marbles from the marble creator, then there are enough
@@ -133,7 +135,7 @@ class Bagger(mp.Process):
                 self.assembler_conn.send(bags)
                 bags = []
             time.sleep(self.bagger_delay)
-        self.assembler_conn.close()
+
 
 class Assembler(mp.Process):
     """ Take the set of marbles and create a gift from them.
@@ -156,28 +158,33 @@ class Assembler(mp.Process):
             gift = Gift(large_marble, bag)
             self.wrapper_conn.send(gift)
             time.sleep(self.assembler_delay)
-        self.wrapper_conn.close()
+
 
 
 
 class Wrapper(mp.Process):
     """ Takes created gifts and wraps them by placing them in the boxes file """
 
-    def __init__(self, wrapper_conn, boxes_filename, wrapper_delay):
+    def __init__(self, wrapper_conn, boxes_filename=BOXES_FILENAME, wrapper_delay=WRAPPER_DELAY):
         mp.Process.__init__(self)
         self.wrapper_conn = wrapper_conn
         self.boxes_filename = boxes_filename
         self.wrapper_delay = wrapper_delay
 
     def run(self):
-        with open(self.boxes_filename, 'a') as boxes_file:
-            while True:
-                gift = self.wrapper_conn.recv()
-                if gift is None:
-                    break
-                timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                boxes_file.write(f'{timestamp}: {gift}\n')
-                time.sleep(self.wrapper_delay)
+        try:
+            with open(self.boxes_filename, 'a') as boxes_file:
+                while True:
+                    gift = self.wrapper_conn.recv()
+                    if gift is None:
+                        break
+                    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    boxes_file.write(f'{timestamp}: {gift}\n')
+                    boxes_file.flush()  # Flush buffer to ensure immediate write
+                    time.sleep(self.wrapper_delay)
+
+        except Exception as e:
+            print(f"Error in Wrapper process: {e}")
 
 
 def display_final_boxes(filename):
