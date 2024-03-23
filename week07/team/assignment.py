@@ -9,17 +9,21 @@ Requirements
 Questions:
 1. What is the relationship between the time to process versus the number of CPUs?
    Does there appear to be an asymptote? If so, what do you think the asymptote is?
-   >
-   >
+   >  processing time decreases with more CPUs due to parallelization benefits. However, diminishing returns occur eventually, 
+   > suggesting an asymptote where further CPU increase doesn't significantly reduce time.
+   > There may be a point where further increasing the number of CPUs doesn't lead to a proportional 
+   > decrease in processing time. This point represents an asymptote. 
+   > 
 2. Is this a CPU bound or IO bound problem? Why?
-   >
+   > This is CPU-bound as processing time depends on computational workload rather than IO operations.
    >
 3. Would threads work on this assignment? Why or why not? (guess if you need to) 
-   >
+   > Threads could work but due to Python's GIL, multiprocessing is more 
+   > effective for CPU-bound tasks like image processing
    >
 4. When you run "create_final_video.py", does it produce a video with the elephants
    inside of the screen?
-   >
+   > Yes
 '''
 
 from matplotlib.pylab import plt  # load plot library
