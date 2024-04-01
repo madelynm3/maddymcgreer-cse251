@@ -2,7 +2,7 @@
 Course: CSE 251
 Lesson Week: 12
 File: assignment.py
-Author: <your name>
+Author: Maddy McGreer
 Purpose: Assignment 12 - Family Search
 """
 import json
@@ -13,8 +13,8 @@ import requests
 from virusApi import *
 
 TOP_API_URL = 'http://127.0.0.1:8129'
-NUMBER_GENERATIONS = 2  # set this to 2 as you are testing your code
-NUMBER_THREADS = 0  # TODO use this to keep track of the number of threads you create
+NUMBER_GENERATIONS = 2
+NUMBER_THREADS = 2
 
 # -----------------------------------------------------------------------------
 
@@ -62,25 +62,26 @@ def dfs_recursion(family_id, pandemic: Pandemic):
             offspring.append(response.json())
 
     # ADD VIRUS1 to Pandemic
-    if virus1 != None:
+    if virus1 is not None:
         v = Virus.createVirus(virus1)
         pandemic.add_virus(v)
-        if v.parents != None:
-            dfs_recursion(v.parents, pandemic)
+        if v.parents is not None:
+        # Create a thread for recursive call
+            thread = threading.Thread(target=dfs_recursion, args=(v.parents, pandemic))
+            thread.start()
 
     # ADD VIRUS2 to Pandemic
-    if virus2 != None:
+    if virus2 is not None:
         v = Virus.createVirus(virus2)
         pandemic.add_virus(v)
-        if v.parents != None:
-            dfs_recursion(v.parents, pandemic)
+        if v.parents is not None:
+        # Create a thread for recursive call
+            thread = threading.Thread(target=dfs_recursion, args=(v.parents, pandemic))
+            thread.start()
 
     # ADD offspring to Pandemic
     for o in offspring:
         v = Virus.createVirus(o)
-        # don't try and add virus that we have already added
-        # (happens when we add a virus and then loop over the
-        # virus parent's offspring)
         if not pandemic.does_virus_exist(v.id):
             pandemic.add_virus(v)
 

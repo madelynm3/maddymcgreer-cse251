@@ -6,7 +6,7 @@ from socketserver import ThreadingMixIn
 
 from virusApi import *
 
-SLEEP = 1 # set this to 0.001 while you are testing, then turn it back to 1
+SLEEP = 0.001 # set this to 0.001 while you are testing, then turn it back to 1
 MAX_GENERATIONS = 6
 
 

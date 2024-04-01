@@ -27,7 +27,6 @@ Questions:
    >one process in each of your five pools:  ___ seconds
    >with the number of processes you show in question one:  ___ seconds
 '''
-
 import glob
 import json
 import math
@@ -77,7 +76,10 @@ def task_prime(value):
             - or -
         {value} is not prime
     """
-    pass
+    if is_prime(value):
+        result_primes.append(f"{value} is prime")
+    else:
+        result_primes.append(f"{value} is not prime")
 
 
 def task_word(word):
@@ -88,7 +90,11 @@ def task_word(word):
             - or -
         {word} not found *****
     """
-    pass
+    with open("words.txt") as f:
+        if word in f.read():
+            result_words.append(f"{word} Found")
+        else:
+            result_words.append(f"{word} not found *****")
 
 
 def task_upper(text):
@@ -96,7 +102,7 @@ def task_upper(text):
     Add the following to the global list:
         {text} ==>  uppercase version of {text}
     """
-    pass
+    result_upper.append(f"{text} ==> {text.upper()}")
 
 
 def task_sum(start_value, end_value):
@@ -104,7 +110,8 @@ def task_sum(start_value, end_value):
     Add the following to the global list:
         sum of {start_value:,} to {end_value:,} = {total:,}
     """
-    pass
+    total = sum(range(start_value, end_value + 1))
+    result_sums.append(f"sum of {start_value:,} to {end_value:,} = {total:,}")
 
 
 def task_name(url):
@@ -115,7 +122,12 @@ def task_name(url):
             - or -
         {url} had an error receiving the information
     """
-    pass
+    try:
+        response = requests.get(url)
+        name = response.json()['name']
+        result_names.append(f"{url} has name {name}")
+    except Exception as e:
+        result_names.append(f"{url} had an error receiving the information")
 
 
 def load_json_file(filename):
@@ -130,67 +142,64 @@ def load_json_file(filename):
 def main():
     begin_time = time.time()
 
-    # TODO Create process pools
+    # Create process pools
+    pool = mp.Pool()
 
-    # The below code is test code to show you the logic of what you are supposed to do.
-    # Remove it and replace with using process pools with apply_async calls.
-    # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    count = 0
+    # List of tasks to be executed asynchronously
+    tasks = []
+
     task_files = glob.glob("tasks/*.task")
     for filename in task_files:
-        # print()
-        # print(filename)
         task = load_json_file(filename)
-        print(task)
-        count += 1
         task_type = task['task']
         if task_type == TYPE_PRIME:
-            task_prime(task['value'])
+            tasks.append(pool.apply_async(task_prime, args=(task['value'],)))
         elif task_type == TYPE_WORD:
-            task_word(task['word'])
+            tasks.append(pool.apply_async(task_word, args=(task['word'],)))
         elif task_type == TYPE_UPPER:
-            task_upper(task['text'])
+            tasks.append(pool.apply_async(task_upper, args=(task['text'],)))
         elif task_type == TYPE_SUM:
-            task_sum(task['start'], task['end'])
+            tasks.append(pool.apply_async(task_sum, args=(task['start'], task['end'])))
         elif task_type == TYPE_NAME:
-            task_name(task['url'])
+            tasks.append(pool.apply_async(task_name, args=(task['url'],)))
         else:
             print(f'Error: unknown task type {task_type}')
-    # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-    # TODO start pools and block until they are done before trying to print
+    # Wait for all tasks to complete
+    for task in tasks:
+        task.get()
 
-    def print_list(lst):
-        for item in lst:
-            print(item)
-        print(' ')
+    # Close the pool
+    pool.close()
+    pool.join()
 
+    # Print results
     print('-' * 80)
     print(f'Primes: {len(result_primes)}')
-    print_list(result_primes)
+    print('\n'.join(result_primes))
 
     print('-' * 80)
     print(f'Words: {len(result_words)}')
-    print_list(result_words)
+    print('\n'.join(result_words))
 
     print('-' * 80)
     print(f'Uppercase: {len(result_upper)}')
-    print_list(result_upper)
+    print('\n'.join(result_upper))
 
     print('-' * 80)
     print(f'Sums: {len(result_sums)}')
-    print_list(result_sums)
+    print('\n'.join(result_sums))
 
     print('-' * 80)
     print(f'Names: {len(result_names)}')
-    print_list(result_names)
+    print('\n'.join(result_names))
 
     print(f'Number of Primes tasks: {len(result_primes)}')
     print(f'Number of Words tasks: {len(result_words)}')
     print(f'Number of Uppercase tasks: {len(result_upper)}')
     print(f'Number of Sums tasks: {len(result_sums)}')
     print(f'Number of Names tasks: {len(result_names)}')
-    print(f'Finished processes {count} tasks = {time.time() - begin_time}')
+    print(f'Finished processes {len(task_files)} tasks = {time.time() - begin_time}')
 
 
 if __name__ == '__main__':

@@ -5,8 +5,8 @@ import time
 from virusApi import *
 
 TOP_API_URL = 'http://127.0.0.1:8129'
-NUMBER_GENERATIONS = 6  # set this to 2 as you are testing your code
-NUMBER_THREADS = 0  # TODO use this to keep track of the number of threads you create
+NUMBER_GENERATIONS = 6
+NUMBER_THREADS = 1
 
 # -----------------------------------------------------------------------------
 
@@ -102,8 +102,10 @@ def bfs_recursion(start_id, pandemic):
         if family_id == "DONE":
             break
 
-        if family_id != None:
-            create_family(family_id, q, pandemic)
+        if family_id is not None:
+            # Create a thread for family creation
+            thread = threading.Thread(target=create_family, args=(family_id, q, pandemic))
+            thread.start()
 
 
 def bfs(start_id, generations):
