@@ -2,7 +2,7 @@
 Course: CSE 251
 Lesson Week: 12
 File: assignment.py
-Author: <your name>
+Author: Maddy McGreer
 Purpose: Assignment 12 - Family Search
 """
 import time

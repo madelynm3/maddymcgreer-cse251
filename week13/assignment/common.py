@@ -1,7 +1,7 @@
 """
 Course: CSE 251, week 12
 File: common.py
-Author: <your name>
+Author: Maddy McGreer
 """
 import time
 import threading
