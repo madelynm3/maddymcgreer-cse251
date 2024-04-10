@@ -24,6 +24,7 @@ def depth_fs_pedigree(family_id, tree):
         req.start()
         req.join()
         family_data = req.response
+        family_data = req.response.json()
 
         # Family object created and added to tree
         family = Family(family_id, family_data)
