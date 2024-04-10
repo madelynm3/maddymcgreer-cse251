@@ -1,0 +1,11 @@
+Current: active threads / max count: 1 / 1
+Request: /
+Sending: {"start_family_id": 5007150814}
+Current: active threads / max count: 1 / 1
+Request: /start/6
+Creating family tree with 6 generations...
+Number of people  : 193
+Number of families: 35
+Sending: {"status":"OK"}
+Current: active threads / max count: 1 / 1
+Request: /family/%3Cbuilt-in%20function%20id%3E
