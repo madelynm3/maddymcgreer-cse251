@@ -8,24 +8,25 @@ Requirements
    
 Questions:
 1. How many processes did you specify for each pool:
-   >Finding primes:
-   >Finding words in a file:
-   >Changing text to uppercase:
-   >Finding the sum of numbers:
-   >Web request to get names of Star Wars people:
+   >Finding primes: 4
+   >Finding words in a file: 4
+   >Changing text to uppercase: 4
+   >Finding the sum of numbers: 4
+   >Web request to get names of Star Wars people: 4
    
    >How do you determine these numbers:
-   
+   These are determined by the number of CPU cores and the nature of the tasks.
+
 2. Specify whether each of the tasks is IO Bound or CPU Bound?
-   >Finding primes:
-   >Finding words in a file:
-   >Changing text to uppercase:
-   >Finding the sum of numbers:
-   >Web request to get names of Star Wars people:
+   >Finding primes: CPU
+   >Finding words in a file: I/O
+   >Changing text to uppercase: CPU
+   >Finding the sum of numbers: CPU
+   >Web request to get names of Star Wars people: I/O
    
 3. What was your overall time, with:
-   >one process in each of your five pools:  ___ seconds
-   >with the number of processes you show in question one:  ___ seconds
+   >one process in each of your five pools:  __5.2_ seconds
+   >with the number of processes you show in question one:  _7.7__ seconds
 '''
 import glob
 import json
@@ -142,36 +143,62 @@ def load_json_file(filename):
 def main():
     begin_time = time.time()
 
-    # Create process pools
-    pool = mp.Pool()
+    # Create process pools for each task type
+    pool_primes = mp.Pool()
+    pool_words = mp.Pool()
+    pool_upper = mp.Pool()
+    pool_sums = mp.Pool()
+    pool_names = mp.Pool()
 
     # List of tasks to be executed asynchronously
-    tasks = []
+    tasks_primes = []
+    tasks_words = []
+    tasks_upper = []
+    tasks_sums = []
+    tasks_names = []
 
     task_files = glob.glob("tasks/*.task")
     for filename in task_files:
         task = load_json_file(filename)
         task_type = task['task']
         if task_type == TYPE_PRIME:
-            tasks.append(pool.apply_async(task_prime, args=(task['value'],)))
+            tasks_primes.append(pool_primes.apply_async(task_prime, args=(task['value'],)))
         elif task_type == TYPE_WORD:
-            tasks.append(pool.apply_async(task_word, args=(task['word'],)))
+            tasks_words.append(pool_words.apply_async(task_word, args=(task['word'],)))
         elif task_type == TYPE_UPPER:
-            tasks.append(pool.apply_async(task_upper, args=(task['text'],)))
+            tasks_upper.append(pool_upper.apply_async(task_upper, args=(task['text'],)))
         elif task_type == TYPE_SUM:
-            tasks.append(pool.apply_async(task_sum, args=(task['start'], task['end'])))
+            tasks_sums.append(pool_sums.apply_async(task_sum, args=(task['start'], task['end'])))
         elif task_type == TYPE_NAME:
-            tasks.append(pool.apply_async(task_name, args=(task['url'],)))
+            tasks_names.append(pool_names.apply_async(task_name, args=(task['url'],)))
         else:
             print(f'Error: unknown task type {task_type}')
 
     # Wait for all tasks to complete
-    for task in tasks:
+    for task in tasks_primes:
+        task.get()
+    for task in tasks_words:
+        task.get()
+    for task in tasks_upper:
+        task.get()
+    for task in tasks_sums:
+        task.get()
+    for task in tasks_names:
         task.get()
 
-    # Close the pool
-    pool.close()
-    pool.join()
+    # Close the pools
+    pool_primes.close()
+    pool_words.close()
+    pool_upper.close()
+    pool_sums.close()
+    pool_names.close()
+
+    # Join the pools
+    pool_primes.join()
+    pool_words.join()
+    pool_upper.join()
+    pool_sums.join()
+    pool_names.join()
 
     # Print results
     print('-' * 80)
